@@ -23,11 +23,16 @@ class SentimentModel:
         self.smooth_negative: float = smooth_negative
         self.smooth_neutral: float = smooth_neutral
 
-        self.stop_words = nltk.corpus.stopwords.words('english')
-        self.stemmer = nltk.PorterStemmer()
+        self.stop_words = set(nltk.corpus.stopwords.words('english'))
+        self.lemmatizer = nltk.WordNetLemmatizer()
 
     def tokenize(self, text: str) -> list[str]:
-        return [self.stemmer.stem(word) for word in nltk.word_tokenize(text.lower()) if word not in self.stop_words]
+        return [
+            self.lemmatizer.lemmatize(word)
+            for word
+            in nltk.word_tokenize(text.lower())
+            if word not in self.stop_words
+        ]
 
     def train(self, data: pandas.DataFrame, text_label="text", sentiment_label="sentiment", classifier=None) -> None:
         def default_classifier(sentiment_id, positive, negative, neutral):
@@ -85,8 +90,6 @@ class SentimentModel:
 
     def predict(self, text: str) -> str:
         words = self.tokenize(text)
-        if len(words) == 0:
-            return "neutral"
 
         prob_positive = self.prior_positive
         prob_negative = self.prior_negative
