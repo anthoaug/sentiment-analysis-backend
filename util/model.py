@@ -1,3 +1,4 @@
+import django.contrib.staticfiles.storage
 import collections
 import pandas
 import numpy
@@ -115,3 +116,18 @@ class SentimentModel:
                 prob_neutral += self.smooth_neutral
 
         return ["positive", "negative", "neutral"][numpy.argmax([prob_positive, prob_negative, prob_neutral])]
+
+
+def _init_model():
+    import json
+
+    with open("static/model/model.json") as model_file:
+        model_config = json.load(model_file)
+        return SentimentModel(**model_config)
+
+
+model_instance: SentimentModel = _init_model()
+
+
+def predict_sentiment(text: str) -> str:
+    return model_instance.predict(text)
