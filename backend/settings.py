@@ -36,7 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'extension'
+    'extension',
+    'website'
 ]
 
 MIDDLEWARE = [
@@ -115,7 +116,8 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static"
+    BASE_DIR / "static",
+    BASE_DIR.parent / "website/build"
 ]
 
 # Default primary key field type
