@@ -1,9 +1,7 @@
-import datetime
-
 import googleapiclient.discovery
+import pandas
 
 from dataclasses import dataclass
-from datetime import datetime
 
 youtube_api = googleapiclient.discovery.build("youtube", "v3", developerKey="AIzaSyC8JDdtacU4cFRLkKa2g-6S6DAaIxdxHKY")
 
@@ -12,7 +10,7 @@ youtube_api = googleapiclient.discovery.build("youtube", "v3", developerKey="AIz
 class CommentData:
     text: str
     likes: int
-    timestamp: datetime
+    timestamp: pandas.Timestamp
 
 
 def get_youtube_comments(video_id: str) -> dict[str, CommentData]:
@@ -54,7 +52,7 @@ def get_youtube_comments(video_id: str) -> dict[str, CommentData]:
                             comments[comment_id] = CommentData(
                                 text=comment_text,
                                 likes=like_count,
-                                timestamp=datetime.fromisoformat(timestamp[:-1])
+                                timestamp=pandas.to_datetime(timestamp)
                             )
 
         if "nextPageToken" not in response:
