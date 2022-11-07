@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-from secrets import DJANGO_SECRET_KEY
+from credentials import DJANGO_SECRET_KEY
 
 from pathlib import Path
 

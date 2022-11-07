@@ -1,7 +1,7 @@
 import googleapiclient.discovery
 import pandas
 
-from secrets import GOOGLE_API_KEY
+from credentials import GOOGLE_API_KEY
 from dataclasses import dataclass
 
 youtube_api = googleapiclient.discovery.build("youtube", "v3", developerKey=GOOGLE_API_KEY)
