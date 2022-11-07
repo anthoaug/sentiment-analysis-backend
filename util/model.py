@@ -2,6 +2,7 @@ from abc import abstractmethod, ABC
 
 import collections
 import pandas
+import string
 import numpy
 import math
 import nltk
@@ -10,6 +11,7 @@ import sys
 
 class NaiveBayesModel(ABC):
     stop_words = set(nltk.corpus.stopwords.words('english'))
+    tokenizer = nltk.tokenize.casual.TweetTokenizer()
     lemmatizer = nltk.WordNetLemmatizer()
 
     def __init__(self, features: dict[str, dict[str, float]] = None, prior_positive: float = 0,
@@ -33,8 +35,8 @@ class NaiveBayesModel(ABC):
         return [
             NaiveBayesModel.lemmatizer.lemmatize(word)
             for word
-            in nltk.word_tokenize(text.lower())
-            if word not in NaiveBayesModel.stop_words
+            in NaiveBayesModel.tokenizer.tokenize((text.lower()))
+            if word not in NaiveBayesModel.stop_words and word not in string.punctuation
         ]
 
     @staticmethod
