@@ -11,7 +11,7 @@ import sys
 
 class NaiveBayesModel(ABC):
     stop_words = set(nltk.corpus.stopwords.words('english'))
-    tokenizer = nltk.tokenize.casual.TweetTokenizer()
+    tokenizer = nltk.tokenize.casual.TweetTokenizer(preserve_case=False, reduce_len=True)
     lemmatizer = nltk.WordNetLemmatizer()
 
     def __init__(self, features: dict[str, dict[str, float]] = None, prior_positive: float = 0,
@@ -35,7 +35,7 @@ class NaiveBayesModel(ABC):
         return [
             NaiveBayesModel.lemmatizer.lemmatize(word)
             for word
-            in NaiveBayesModel.tokenizer.tokenize((text.lower()))
+            in NaiveBayesModel.tokenizer.tokenize(text)
             if word not in NaiveBayesModel.stop_words and word not in string.punctuation
         ]
 
