@@ -2,7 +2,7 @@
 import pandas
 import os
 
-from credentials import TWITTER_BEARER_TOKEN, TWITTER_API_KEY, TWITTER_API_KEY_SECRET
+# from credentials import TWITTER_BEARER_TOKEN, TWITTER_API_KEY, TWITTER_API_KEY_SECRET
 # from searchtweets import load_credentials
 from util import CommentData
 
