@@ -2,16 +2,9 @@ import googleapiclient.discovery
 import pandas
 
 from credentials import GOOGLE_API_KEY
-from dataclasses import dataclass
+from util.util import CommentData
 
 youtube_api = googleapiclient.discovery.build("youtube", "v3", developerKey=GOOGLE_API_KEY)
-
-
-@dataclass
-class CommentData:
-    text: str
-    likes: int
-    timestamp: pandas.Timestamp
 
 
 def get_youtube_comments(video_id: str) -> dict[str, CommentData]:
