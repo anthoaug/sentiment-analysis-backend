@@ -11,16 +11,13 @@ class CommentData:
     timestamp: pandas.Timestamp
 
 
-def _init_model():
+def _init_model(config: str):
     import json
 
-    with open("static/model/model.json") as model_file:
+    with open(config) as model_file:
         model_config = json.load(model_file)
         return MultinomialBayes(**model_config)
 
 
-model_instance: MultinomialBayes = _init_model()
-
-
-def predict_sentiment(text: str) -> str:
-    return model_instance.predict(text)
+youtube_model: MultinomialBayes = _init_model("static/model/youtube_model.json")
+twitter_model: MultinomialBayes = _init_model("static/model/twitter_model.json")

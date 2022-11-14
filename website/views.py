@@ -1,6 +1,6 @@
 import pandas
 
-from util import CommentData, get_youtube_comments, predict_sentiment
+from util import CommentData, get_youtube_comments, youtube_model
 from django.http import HttpResponse, JsonResponse
 
 MONTH_INTERVAL = pandas.to_timedelta(arg=30, unit='D')
@@ -16,7 +16,7 @@ def youtube(request, video_id: str):
 
     data = []
     for _, comment_data in comments_dict.items():
-        sentiment = predict_sentiment(comment_data.text)
+        sentiment = youtube_model.predict(comment_data.text)
 
         data.append((
             comment_data.timestamp,

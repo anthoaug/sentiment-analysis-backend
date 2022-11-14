@@ -1,5 +1,5 @@
+from util import CommentData, get_youtube_comments, youtube_model, twitter_model
 from django.http import HttpResponse, HttpRequest, JsonResponse
-from util import CommentData, get_youtube_comments, predict_sentiment
 
 
 def index(request):
@@ -12,9 +12,13 @@ def youtube(request: HttpRequest, video_id: str):
     counts: dict[str, int] = {"positive": 0, "negative": 0, "neutral": 0}
     sentiments: dict[str, str] = {}
     for comment_id, data in comments_dict.items():
-        sentiment = predict_sentiment(data.text)
+        sentiment = youtube_model.predict(data.text)
 
         sentiments[comment_id] = sentiment
         counts[sentiment] += 1
 
     return JsonResponse({"sentiments": sentiments, "counts": counts})
+
+
+def twitter(request: HttpRequest, reply_text: str):
+    return HttpResponse(twitter_model.predict(reply_text))
