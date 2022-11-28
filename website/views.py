@@ -1,47 +1,73 @@
-import pandas
+import django.contrib.auth as auth
 
-from util import CommentData, get_youtube_comments, youtube_model
-from django.http import HttpResponse, JsonResponse
-
-MONTH_INTERVAL = pandas.to_timedelta(arg=30, unit='D')
-YEAR_INTERVAL = pandas.to_timedelta(arg=365, unit='D')
+from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest
+from django.views.decorators.http import require_GET
+from django.contrib.auth.models import User
+from django.shortcuts import render
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the website index.")
+    return render(request, "build/index.html")
 
 
-def youtube(request, video_id: str):
-    comments_dict: dict[str, CommentData] = get_youtube_comments(video_id)
+def account(request: HttpRequest):
+    if not request.user.is_authenticated:
+        return HttpResponseBadRequest("You're not currently logged in.")
 
-    data = []
-    for _, comment_data in comments_dict.items():
-        sentiment = youtube_model.predict(comment_data.text)
+    return HttpResponse(f"You're logged in with the username {request.user.username}.")
 
-        data.append((
-            comment_data.timestamp,
-            1 if sentiment == "positive" else 0,
-            1 if sentiment == "negative" else 0,
-            1 if sentiment == "neutral" else 0
-        ))
 
-    df: pandas.DataFrame = pandas.DataFrame(data, columns=["date", "positive", "negative", "neutral"])
-    df = df.sort_values(by="date")
+@require_GET
+def signup(request: HttpRequest):
+    # data = json.loads(request.GET)
+    #
+    # username = data["username"]
+    # password = data["password"]
 
-    df_all: pandas.DataFrame = df[["positive", "negative", "neutral"]].expanding().sum()
-    df_month: pandas.DataFrame = df.rolling(MONTH_INTERVAL, on="date").sum()[["positive", "negative", "neutral"]]
-    df_year: pandas.DataFrame = df.rolling(YEAR_INTERVAL, on="date").sum()[["positive", "negative", "neutral"]]
+    username = request.GET.get("username")
+    password = request.GET.get("password")
 
-    return JsonResponse({
-        "absolute": {
-            "all": df_all.to_dict('list'),
-            "month": df_month.to_dict('list'),
-            "year": df_year.to_dict('list')
-        },
-        "relative": {
-            "all": df_all.div(df_all.sum(axis=1), axis=0).to_dict('list'),
-            "month": df_month.div(df_month.sum(axis=1), axis=0).to_dict('list'),
-            "year": df_year.div(df_year.sum(axis=1), axis=0).to_dict('list'),
-        },
-        "timestamps": df["date"].tolist()
-    })
+    if username is None or password is None:
+        return HttpResponseBadRequest("Please supply both a username and password.")
+
+    if User.objects.filter(username=username).exists():
+        return HttpResponseBadRequest(f"Username {username} already exists.")
+
+    user = User.objects.create_user(username=username, password=password)
+
+    if user is None:
+        return HttpResponseBadRequest(f"Unable to create user with username {username}.")
+
+    return HttpResponse(f"Successfully created user with username {username}.")
+
+
+@require_GET
+def login(request: HttpRequest):
+    # data = json.loads(request.body)
+    #
+    # username = data["username"]
+    # password = data["password"]
+
+    username = request.GET.get("username")
+    password = request.GET.get("password")
+
+    if username is None or password is None:
+        return HttpResponseBadRequest("Please supply both a username and password.")
+
+    user = auth.authenticate(username=username, password=password)
+
+    if user is None:
+        return HttpResponseBadRequest("Invalid username or password.")
+
+    auth.login(request, user)
+
+    return HttpResponse("Succesfully logged in.")
+
+
+def logout(request: HttpRequest):
+    if not request.user.is_authenticated:
+        return HttpResponseBadRequest("You're not currently logged in.")
+
+    auth.logout(request)
+
+    return HttpResponse("Successfully logged out.")
