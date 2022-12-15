@@ -54,3 +54,23 @@ def get_youtube_comments(video_id: str) -> dict[str, CommentData]:
         next_page_token = response["nextPageToken"]
 
     return comments
+
+
+def get_channel_id(username: str):
+    request = youtube_api.channels().list(
+        part="id",
+        forUsername=username
+    )
+    response = request.execute()
+
+    match response:
+        case {
+            "items": [
+                {
+                    'id': str(channel_id)
+                }
+            ]
+        }:
+            return channel_id
+
+    return None

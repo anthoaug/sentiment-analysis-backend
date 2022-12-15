@@ -64,3 +64,7 @@ def youtube_website(request, video_id: str):
         },
         "timestamps": df["date"].tolist()
     })
+
+
+def twitter_website(tweet_id: str):
+    pass

@@ -1,55 +1,65 @@
 import django.contrib.auth as auth
+import json
+import re
 
 from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
+from website.models import FollowedUsers
 from django.shortcuts import render
+from util import get_channel_id
 
 
 def index(request):
     return render(request, "build/index.html")
 
 
-def account(request: HttpRequest):
+def test(request):
+    return HttpResponse("Test.")
+
+
+def session(request: HttpRequest):
     if not request.user.is_authenticated:
         return HttpResponseBadRequest("You're not currently logged in.")
 
     return HttpResponse(f"You're logged in with the username {request.user.username}.")
 
 
-@require_GET
-def signup(request: HttpRequest):
-    # data = json.loads(request.GET)
-    #
-    # username = data["username"]
-    # password = data["password"]
+@require_POST
+def register(request: HttpRequest):
+    data = json.loads(request.body)
 
-    username = request.GET.get("username")
-    password = request.GET.get("password")
+    username: str = data["username"]
+    password: str = data["password"]
 
     if username is None or password is None:
         return HttpResponseBadRequest("Please supply both a username and password.")
 
+    if not re.fullmatch(r"\w+", username):
+        return HttpResponseBadRequest(f"Invalid username '{username}'. Use only letters, numbers and underscores.")
+
     if User.objects.filter(username=username).exists():
-        return HttpResponseBadRequest(f"Username {username} already exists.")
+        return HttpResponseBadRequest(f"Username '{username}' already exists.")
 
     user = User.objects.create_user(username=username, password=password)
 
     if user is None:
-        return HttpResponseBadRequest(f"Unable to create user with username {username}.")
+        return HttpResponseBadRequest(f"Unable to create user with username '{username}'.")
 
-    return HttpResponse(f"Successfully created user with username {username}.")
+    followed_users = FollowedUsers(user=user)
+    followed_users.save()
+
+    auth.login(request, user)
+
+    return HttpResponse(f"Successfully created and signed in user with username '{username}'.")
 
 
-@require_GET
+@require_POST
 def login(request: HttpRequest):
-    # data = json.loads(request.body)
-    #
-    # username = data["username"]
-    # password = data["password"]
+    data = json.loads(request.body)
 
-    username = request.GET.get("username")
-    password = request.GET.get("password")
+    username = data["username"]
+    password = data["password"]
 
     if username is None or password is None:
         return HttpResponseBadRequest("Please supply both a username and password.")
@@ -71,3 +81,28 @@ def logout(request: HttpRequest):
     auth.logout(request)
 
     return HttpResponse("Successfully logged out.")
+
+
+@require_POST
+def add_follower(request: HttpRequest):
+    if not request.user.is_authenticated:
+        return HttpResponseBadRequest("You're not currently logged in.")
+
+    data = json.loads(request.body)
+
+    username: str = data["username"]
+
+    if username is None:
+        return HttpResponseBadRequest("Please supply a username to follow.")
+
+    channel_id: str = get_channel_id(username)
+    if channel_id is None:
+        return HttpResponseBadRequest("Invalid username.")
+
+    followed = request.user.followed_users.followed
+    followed.append({"username": username, "channel_id": channel_id})
+    request.user.followed_users.save()
+
+    print(request.user.followed_users.followed)
+
+    return HttpResponse("Test.")

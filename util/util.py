@@ -12,7 +12,10 @@ class CommentData:
 
 
 def _init_model(config: str):
-    import json
+    import json, __main__
+
+    if hasattr(__main__, "__file__") and __main__.__file__.endswith("scratch.py"):
+        config = "../" + config
 
     with open(config) as model_file:
         model_config = json.load(model_file)
