@@ -7,12 +7,12 @@ from util.util import CommentData
 youtube_api = googleapiclient.discovery.build("youtube", "v3", developerKey=GOOGLE_API_KEY)
 
 
-def get_youtube_comments(video_id: str) -> dict[str, CommentData]:
+def get_youtube_comments(video_id: str) -> dict:
     """
     @param video_id: ID of the YouTube video to retrieve comments from.
     @return: Dictionary of comment ID to a 2-tuple of the original text of the comment and its like count.
     """
-    comments: dict[str, CommentData] = {}
+    comments: dict = {}
 
     next_page_token = None
     while True:
@@ -25,29 +25,18 @@ def get_youtube_comments(video_id: str) -> dict[str, CommentData]:
         )
         response = request.execute()
 
-        match response:
-            case {
-                "items": list(items)
-            }:
-                for item in items:
-                    match item:
-                        case {
-                            "id": str(comment_id),
-                            "snippet": {
-                                "topLevelComment": {
-                                    "snippet": {
-                                        "textOriginal": str(comment_text),
-                                        "likeCount": int(like_count),
-                                        "publishedAt": str(timestamp)
-                                    }
-                                }
-                            }
-                        }:
-                            comments[comment_id] = CommentData(
-                                text=comment_text,
-                                likes=like_count,
-                                timestamp=pandas.to_datetime(timestamp)
-                            )
+        if "items" in response:
+            for item in response["items"]:
+                comment_id: str = str(item["id"])
+                comment_text: str = str(item["snippet"]["topLevelComment"]["snippet"]["textOriginal"])
+                like_count: int = int(item["snippet"]["topLevelComment"]["snippet"]["likeCount"])
+                timestamp: str = str(item["snippet"]["topLevelComment"]["snippet"]["publishedAt"])
+
+                comments[comment_id] = CommentData(
+                    text=comment_text,
+                    likes=like_count,
+                    timestamp=pandas.to_datetime(timestamp)
+                )
 
         if "nextPageToken" not in response:
             break
@@ -58,19 +47,25 @@ def get_youtube_comments(video_id: str) -> dict[str, CommentData]:
 
 def get_channel_id(username: str):
     request = youtube_api.channels().list(
-        part="id",
+        part="contentDetails",
         forUsername=username
     )
     response = request.execute()
 
-    match response:
-        case {
-            "items": [
-                {
-                    'id': str(channel_id)
-                }
-            ]
-        }:
-            return channel_id
+    if "items" in response:
+        return str(response["items"]["id"])
 
     return None
+
+
+def get_videos(channel_id: str):
+    upload_playlist = "UU" + channel_id[2:]
+    print(upload_playlist)
+
+    request = youtube_api.playlists().list(
+        part="snippet",
+        id=upload_playlist
+    )
+    response = request.execute()
+
+    print(response)

@@ -14,13 +14,13 @@ class NaiveBayesModel(ABC):
     tokenizer = nltk.tokenize.casual.TweetTokenizer(preserve_case=False, reduce_len=True)
     lemmatizer = nltk.WordNetLemmatizer()
 
-    def __init__(self, features: dict[str, dict[str, float]] = None, prior_positive: float = 0,
+    def __init__(self, features: dict = None, prior_positive: float = 0,
                  prior_negative: float = 0, prior_neutral: float = 0, smooth_positive: float = 0,
                  smooth_negative: float = 0, smooth_neutral: float = 0) -> None:
         if features is None:
-            self.features: dict[str, dict[str, float]] = {"positive": {}, "negative": {}, "neutral": {}}
+            self.features: dict = {"positive": {}, "negative": {}, "neutral": {}}
         else:
-            self.features: dict[str, dict[str, float]] = features
+            self.features: dict = features
 
         self.prior_positive: float = prior_positive
         self.prior_negative: float = prior_negative
@@ -31,7 +31,7 @@ class NaiveBayesModel(ABC):
         self.smooth_neutral: float = smooth_neutral
 
     @staticmethod
-    def tokenize(text: str) -> list[str]:
+    def tokenize(text: str) -> list:
         return [
             NaiveBayesModel.lemmatizer.lemmatize(word)
             for word
@@ -58,7 +58,7 @@ class NaiveBayesModel(ABC):
 
         text: str
         for index, text, sentiment in data[[text_label, sentiment_label]].itertuples():
-            words: list[str] = NaiveBayesModel.tokenize(text)
+            words: list = NaiveBayesModel.tokenize(text)
             if len(words) == 0:
                 continue
 

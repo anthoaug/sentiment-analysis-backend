@@ -7,10 +7,10 @@ import pandas
 # Extension
 
 def youtube_extension(request: HttpRequest, video_id: str):
-    comments_dict: dict[str, CommentData] = get_youtube_comments(video_id)
+    comments_dict: dict = get_youtube_comments(video_id)
 
-    counts: dict[str, int] = {"positive": 0, "negative": 0, "neutral": 0}
-    sentiments: dict[str, str] = {}
+    counts: dict = {"positive": 0, "negative": 0, "neutral": 0}
+    sentiments: dict = {}
     for comment_id, data in comments_dict.items():
         sentiment = youtube_model.predict(data.text)
 
@@ -31,7 +31,7 @@ YEAR_INTERVAL = pandas.to_timedelta(arg=365, unit='D')
 
 
 def youtube_website(request, video_id: str):
-    comments_dict: dict[str, CommentData] = get_youtube_comments(video_id)
+    comments_dict: dict = get_youtube_comments(video_id)
 
     data = []
     for _, comment_data in comments_dict.items():

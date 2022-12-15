@@ -5,9 +5,9 @@ import re
 from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest
 from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
+from util import get_channel_id, get_videos
 from website.models import FollowedUsers
 from django.shortcuts import render
-from util import get_channel_id
 
 
 def index(request):
@@ -95,14 +95,31 @@ def add_follower(request: HttpRequest):
     if username is None:
         return HttpResponseBadRequest("Please supply a username to follow.")
 
+    followed = request.user.followed_users.followed
+    # if username in followed:
+    #     return HttpResponseBadRequest(f"You already follow '{username}'.")
+
     channel_id: str = get_channel_id(username)
     if channel_id is None:
         return HttpResponseBadRequest("Invalid username.")
 
-    followed = request.user.followed_users.followed
-    followed.append({"username": username, "channel_id": channel_id})
+    followed[username] = channel_id
+
     request.user.followed_users.save()
 
     print(request.user.followed_users.followed)
+
+    return HttpResponse("Success!")
+
+
+def get_feed(request: HttpRequest):
+    if not request.user.is_authenticated:
+        return HttpResponseBadRequest("You're not currently logged in.")
+
+    followed = request.user.followed_users.followed
+
+    for username, channel_id in followed.items():
+        print(username, channel_id)
+        get_videos(channel_id)
 
     return HttpResponse("Test.")
