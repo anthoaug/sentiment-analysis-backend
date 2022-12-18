@@ -8,6 +8,10 @@ import math
 import nltk
 import sys
 
+nltk.download('stopwords')
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
 
 class NaiveBayesModel(ABC):
     stop_words = set(nltk.corpus.stopwords.words('english'))
