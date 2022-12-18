@@ -22,5 +22,5 @@ def _init_model(config: str):
         return MultinomialBayes(**model_config)
 
 
-youtube_model: MultinomialBayes = _init_model("static/model/youtube_model.json")
-twitter_model: MultinomialBayes = _init_model("static/model/twitter_model.json")
+youtube_model: MultinomialBayes = _init_model("util/model/youtube_model.json")
+twitter_model: MultinomialBayes = _init_model("util/model/twitter_model.json")

@@ -26,7 +26,7 @@ SECRET_KEY = DJANGO_SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["django-env.eba-yjk4y3nd.us-west-2.elasticbeanstalk.com"]
+ALLOWED_HOSTS = ["localhost", "django-env.eba-yjk4y3nd.us-west-2.elasticbeanstalk.com"]
 
 # Application definition
 
@@ -58,7 +58,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR.parent.joinpath("website")],
+        'DIRS': [BASE_DIR.joinpath("static")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -116,10 +116,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = 'static-store'
+STATIC_ROOT = 'static'
 
 STATICFILES_DIRS = [
-    BASE_DIR.joinpath("static"),
     BASE_DIR.parent.joinpath("website", "build", "static")
 ]
 

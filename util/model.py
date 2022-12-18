@@ -8,6 +8,7 @@ import math
 import nltk
 import sys
 
+
 class NaiveBayesModel(ABC):
     stop_words = set(nltk.corpus.stopwords.words('english'))
     tokenizer = nltk.tokenize.casual.TweetTokenizer(preserve_case=False, reduce_len=True)
