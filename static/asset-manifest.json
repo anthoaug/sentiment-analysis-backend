@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/static/css/main.72d04149.css",
-    "main.js": "/static/js/main.747ca7a1.js",
+    "main.js": "/static/js/main.504c288d.js",
     "static/media/aboutIllustration.svg": "/static/media/aboutIllustration.f684dc6450113593e9604b2a11d948f3.svg",
     "static/media/analyticsIllustration.svg": "/static/media/analyticsIllustration.7988beb1fb7f48191793dfa50826a0f9.svg",
     "static/media/spinning-gear.gif": "/static/media/spinning-gear.4c59be6cf74614d66c95.gif",
     "index.html": "/index.html",
     "main.72d04149.css.map": "/static/css/main.72d04149.css.map",
-    "main.747ca7a1.js.map": "/static/js/main.747ca7a1.js.map"
+    "main.504c288d.js.map": "/static/js/main.504c288d.js.map"
   },
   "entrypoints": [
     "static/css/main.72d04149.css",
-    "static/js/main.747ca7a1.js"
+    "static/js/main.504c288d.js"
   ]
 }

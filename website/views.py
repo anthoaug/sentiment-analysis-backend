@@ -3,6 +3,7 @@ import json
 import re
 
 from django.http import HttpResponse, HttpRequest, HttpResponseBadRequest
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
 from util import get_channel_id, get_videos
@@ -10,12 +11,9 @@ from website.models import FollowedUsers
 from django.shortcuts import render
 
 
+@ensure_csrf_cookie
 def index(request):
     return render(request, "index.html")
-
-
-def test(request):
-    return HttpResponse("Test.")
 
 
 def session(request: HttpRequest):

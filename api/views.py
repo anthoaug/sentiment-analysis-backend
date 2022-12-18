@@ -1,11 +1,13 @@
 from util import CommentData, youtube_model, twitter_model, get_youtube_comments
 from django.http import HttpResponse, HttpRequest, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 import pandas
 
 
 # Extension
 
+@csrf_exempt
 def youtube_extension(request: HttpRequest, video_id: str):
     comments_dict: dict = get_youtube_comments(video_id)
 
@@ -20,6 +22,7 @@ def youtube_extension(request: HttpRequest, video_id: str):
     return JsonResponse({"sentiments": sentiments, "counts": counts})
 
 
+@csrf_exempt
 def twitter_extension(request: HttpRequest, reply_text: str):
     return HttpResponse(twitter_model.predict(reply_text))
 
@@ -30,6 +33,7 @@ MONTH_INTERVAL = pandas.to_timedelta(arg=30, unit='D')
 YEAR_INTERVAL = pandas.to_timedelta(arg=365, unit='D')
 
 
+@csrf_exempt
 def youtube_website(request, video_id: str):
     comments_dict: dict = get_youtube_comments(video_id)
 
@@ -66,5 +70,6 @@ def youtube_website(request, video_id: str):
     })
 
 
+@csrf_exempt
 def twitter_website(tweet_id: str):
     pass
